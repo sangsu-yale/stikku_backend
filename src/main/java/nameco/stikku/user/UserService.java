@@ -1,12 +1,9 @@
 package nameco.stikku.user;
 
-import nameco.stikku.dto.ErrorResponse;
-import nameco.stikku.dto.MessageResponse;
-import nameco.stikku.dto.UserDTO;
+import nameco.stikku.user.dto.UserDTO;
 import nameco.stikku.user.exception.InvalidUserDataException;
 import nameco.stikku.user.exception.UserNotFoundExeption;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -51,6 +48,7 @@ public class UserService {
     }
 
     public String deleteUser(Long userId) {
+        // TODO : userServie - 권한 확인 필요
         if (userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
             // TODO : userService - 게임 삭제 필요

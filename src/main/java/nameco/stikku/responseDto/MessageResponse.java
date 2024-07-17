@@ -1,4 +1,4 @@
-package nameco.stikku.dto;
+package nameco.stikku.responseDto;
 
 import lombok.Getter;
 import lombok.Setter;

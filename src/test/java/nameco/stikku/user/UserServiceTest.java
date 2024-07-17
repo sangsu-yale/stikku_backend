@@ -1,6 +1,6 @@
 package nameco.stikku.user;
 
-import nameco.stikku.dto.UserDTO;
+import nameco.stikku.user.dto.UserDTO;
 import nameco.stikku.user.exception.InvalidUserDataException;
 import nameco.stikku.user.exception.UserNotFoundExeption;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;

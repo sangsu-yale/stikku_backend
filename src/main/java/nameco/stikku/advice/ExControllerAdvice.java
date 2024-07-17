@@ -1,6 +1,6 @@
 package nameco.stikku.advice;
 
-import nameco.stikku.dto.ErrorResponse;
+import nameco.stikku.responseDto.ErrorResponse;
 import nameco.stikku.user.exception.InvalidUserDataException;
 import nameco.stikku.user.exception.UserNotFoundExeption;
 import org.springframework.http.HttpStatus;

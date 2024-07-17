@@ -1,8 +1,7 @@
 package nameco.stikku.user;
 
-import lombok.extern.slf4j.Slf4j;
-import nameco.stikku.dto.MessageResponse;
-import nameco.stikku.dto.UserDTO;
+import nameco.stikku.responseDto.MessageResponse;
+import nameco.stikku.user.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
