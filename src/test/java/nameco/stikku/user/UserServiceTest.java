@@ -1,8 +1,8 @@
 package nameco.stikku.user;
 
 import nameco.stikku.user.dto.UserDTO;
-import nameco.stikku.user.exception.InvalidUserDataException;
-import nameco.stikku.user.exception.UserNotFoundExeption;
+import nameco.stikku.advice.exception.InvalidUserDataException;
+import nameco.stikku.advice.exception.UserNotFoundExeption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

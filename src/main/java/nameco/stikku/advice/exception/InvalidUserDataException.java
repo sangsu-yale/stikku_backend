@@ -1,4 +1,4 @@
-package nameco.stikku.user.exception;
+package nameco.stikku.advice.exception;
 
 public class InvalidUserDataException extends RuntimeException {
     public InvalidUserDataException() {

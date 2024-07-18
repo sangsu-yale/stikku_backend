@@ -1,8 +1,8 @@
 package nameco.stikku.user;
 
 import nameco.stikku.user.dto.UserDTO;
-import nameco.stikku.user.exception.InvalidUserDataException;
-import nameco.stikku.user.exception.UserNotFoundExeption;
+import nameco.stikku.advice.exception.InvalidUserDataException;
+import nameco.stikku.advice.exception.UserNotFoundExeption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

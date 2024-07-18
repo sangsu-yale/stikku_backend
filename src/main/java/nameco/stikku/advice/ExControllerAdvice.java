@@ -1,8 +1,8 @@
 package nameco.stikku.advice;
 
 import nameco.stikku.responseDto.ErrorResponse;
-import nameco.stikku.user.exception.InvalidUserDataException;
-import nameco.stikku.user.exception.UserNotFoundExeption;
+import nameco.stikku.advice.exception.InvalidUserDataException;
+import nameco.stikku.advice.exception.UserNotFoundExeption;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
