@@ -2,7 +2,7 @@ package nameco.stikku.user;
 
 import nameco.stikku.user.dto.UserDTO;
 import nameco.stikku.advice.exception.InvalidUserDataException;
-import nameco.stikku.advice.exception.UserNotFoundExeption;
+import nameco.stikku.advice.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +19,11 @@ public class UserService {
     // TODO : userService - createUser
 
     public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundExeption(userId.toString()));
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
     }
 
     public User updateUser(Long userId, UserDTO userDTO) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundExeption(userId.toString()));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
 
         if(userDTO.getUsername() != null) {
             if (userDTO.getUsername().isEmpty()) {
@@ -54,7 +54,7 @@ public class UserService {
             // TODO : userService - 게임 삭제 필요
             return userId.toString();
         } else {
-            throw new UserNotFoundExeption(userId.toString());
+            throw new UserNotFoundException(userId.toString());
         }
     }
 

@@ -2,7 +2,7 @@ package nameco.stikku.user;
 
 import nameco.stikku.user.dto.UserDTO;
 import nameco.stikku.advice.exception.InvalidUserDataException;
-import nameco.stikku.advice.exception.UserNotFoundExeption;
+import nameco.stikku.advice.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.getUserById(1L))
-                .isInstanceOf(UserNotFoundExeption.class)
+                .isInstanceOf(UserNotFoundException.class)
                 .hasMessageMatching(".*id 1.*");
     }
 
@@ -155,7 +155,7 @@ class UserServiceTest {
         when(userRepository.existsById(1L)).thenReturn(false);
 
         assertThatThrownBy(() -> userService.deleteUser(1L))
-                .isInstanceOf(UserNotFoundExeption.class)
+                .isInstanceOf(UserNotFoundException.class)
                 .hasMessageMatching(".*id 1.*");
     }
 }
