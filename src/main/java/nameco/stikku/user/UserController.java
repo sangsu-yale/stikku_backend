@@ -3,6 +3,8 @@ package nameco.stikku.user;
 import nameco.stikku.responseDto.MessageResponse;
 import nameco.stikku.user.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,18 +20,18 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}")
-    public User getUserById(@PathVariable("user_id") Long userId) {
-        return userService.getUserById(userId);
+    public ResponseEntity<User> getUserById(@PathVariable("user_id") Long userId) {
+        return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
     @PutMapping("/{user_id}")
-    public User updateUser(@PathVariable("user_id") Long userId, @RequestBody UserDTO userDTO) {
-        return userService.updateUser(userId, userDTO);
+    public ResponseEntity<User> updateUser(@PathVariable("user_id") Long userId, @RequestBody UserDTO userDTO) {
+        return new ResponseEntity<>(userService.updateUser(userId, userDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{user_id}")
-    public MessageResponse deleteUser(@PathVariable("user_id") Long userId) {
+    public ResponseEntity<MessageResponse> deleteUser(@PathVariable("user_id") Long userId) {
         String deletedUserId = userService.deleteUser(userId);
-        return new MessageResponse("User " + deletedUserId + " deleted successfully");
+        return new ResponseEntity<>(new MessageResponse("User " + deletedUserId + " deleted successfully"), HttpStatus.OK);
     }
 }
