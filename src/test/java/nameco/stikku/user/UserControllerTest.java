@@ -1,5 +1,12 @@
 package nameco.stikku.user;
 
+import nameco.stikku.game.GameResultRepository;
+import nameco.stikku.game.GameReviewRepository;
+import nameco.stikku.game.domain.GameResult;
+import nameco.stikku.game.domain.GameReview;
+import nameco.stikku.game.dto.GameRequestDto;
+import nameco.stikku.game.dto.GameResultDto;
+import nameco.stikku.game.dto.GameReviewDto;
 import nameco.stikku.user.dto.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -29,9 +39,17 @@ class UserControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private GameResultRepository gameResultRepository;
+
+    @Autowired
+    private GameReviewRepository gameReviewRepository;
+
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
+        gameResultRepository.deleteAll();
+        gameReviewRepository.deleteAll();
     }
 
     @Test
@@ -58,6 +76,32 @@ class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", containsString("User not found with id 1")))
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[게임 조회] 특정 유저의 모든 게임 조회")
+    void getAllGameByUserId() throws Exception {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("test@example.com");
+        userRepository.save(user);
+
+        GameResult gameResult1 = createTestGameResult(1L);
+        GameResult gameResult2 = createTestGameResult(2L);
+        GameReview gameReview1 = createTestGameReview(1L, 1L);
+        GameReview gameReview2 = createTestGameReview(1L, 2L);
+
+        gameResultRepository.save(gameResult1);
+        gameResultRepository.save(gameResult2);
+        gameReviewRepository.save(gameReview1);
+        gameReviewRepository.save(gameReview2);
+
+        mockMvc.perform(get("/users/1/game"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].gameResult.id").value(1))
+                .andExpect(jsonPath("$[0].gameReview.gameResultId").value(1))
+                .andExpect(jsonPath("$", hasSize(2)));
+
     }
 
     @Test
@@ -103,5 +147,60 @@ class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", containsString("User not found with id 1")))
                 .andDo(print());
+    }
+
+    private GameResult createTestGameResult(Long id) {
+
+        GameResult gameResult = new GameResult();
+        gameResult.setId(id);
+        gameResult.setUserId(1L);
+        gameResult.setResult(GameResult.GameResultStatus.WIN);
+        gameResult.setLiveView(true);
+        gameResult.setDate(LocalDate.now());
+        gameResult.setTeam1("삼성 라이온즈");
+        gameResult.setTeam2("기아 타이거즈");
+        gameResult.setScore1(2);
+        gameResult.setScore2(3);
+        gameResult.setTeam1IsMyteam(true);
+        gameResult.setComment("개노잼경기 1붐따 드립니다");
+
+        return gameResult;
+    }
+
+    private GameReview createTestGameReview(Long id, Long gameResultId) {
+        GameReview gameReview = new GameReview();
+        gameReview.setId(id);
+        gameReview.setGameResultId(gameResultId);
+        gameReview.setReview("우리는 언제쯤 기아를 이길수있을까? 기아 엉덩이 만지기도 참으로 지겹다.");
+        gameReview.setRating(1);
+        gameReview.setPlayerOfTheMatch("이재현");
+        gameReview.setMood(GameReview.Mood.BORED);
+        gameReview.setFood("두바이초콜릿맛쿠키");
+
+        return gameReview;
+    }
+
+    private GameRequestDto createTestGameRequestDto() {
+
+        GameResultDto gameResultDto = new GameResultDto();
+        gameResultDto.setUserId(1L);
+        gameResultDto.setResult(GameResult.GameResultStatus.WIN);
+        gameResultDto.setLiveView(true);
+        gameResultDto.setDate(LocalDate.now());
+        gameResultDto.setTeam1("삼성 라이온즈");
+        gameResultDto.setTeam2("기아 타이거즈");
+        gameResultDto.setScore1(5);
+        gameResultDto.setScore2(3);
+        gameResultDto.setTeam1IsMyTeam(true);
+        gameResultDto.setComment("개노잼경기 1붐따 드립니다");
+
+        GameReviewDto gameReviewDto = new GameReviewDto();
+        gameReviewDto.setReview("우리는 언제쯤 기아를 이길수있을까? 기아 엉덩이 만지기도 참으로 지겹다.");
+        gameReviewDto.setRating(5);
+        gameReviewDto.setPlayerOfTheMatch("이재현");
+        gameReviewDto.setMood(GameReview.Mood.BORED);
+        gameReviewDto.setFood("두바이초콜릿맛쿠키");
+
+        return new GameRequestDto(gameResultDto, gameReviewDto);
     }
 }

@@ -66,8 +66,30 @@ public class GameService {
         GameReview gameReview = new GameReview();
         if (gameReviewOptional.isPresent()) {
             gameReview = gameReviewOptional.get();
+        } else {
+            gameReview.setGameResultId(gameResult.getId());
+            gameReview = gameReviewRepository.save(gameReview);
         }
         return new GameResponseDto(gameResult, gameReview);
+    }
+
+    public List<GameResponseDto> getAllGameByUserId(Long userId) {
+        List<GameResponseDto> gameResponseDtos = new ArrayList<>();
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
+
+        List<GameResult> gameResults = gameResultRepository.findGameResultByUserId(userId);
+        for(GameResult gameResult : gameResults) {
+            Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameResult.getId());
+            if (gameReviewOptional.isPresent()){
+                gameResponseDtos.add(new GameResponseDto(gameResult, gameReviewOptional.get()));
+            } else {
+                GameReview gameReview = new GameReview();
+                gameReview.setGameResultId(gameResult.getId());
+                gameReview = gameReviewRepository.save(gameReview);
+                gameResponseDtos.add(new GameResponseDto(gameResult, gameReview));
+            }
+        }
+        return gameResponseDtos;
     }
 
     @Transactional
@@ -87,7 +109,12 @@ public class GameService {
 
         Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameId);
         GameReview gameReview = new GameReview();
-        if (gameReviewOptional.isPresent()) gameReview = gameReviewOptional.get();
+        if (gameReviewOptional.isPresent()) {
+            gameReview = gameReviewOptional.get();
+        } else {
+            gameReview = new GameReview();
+            gameReview.setGameResultId(gameResult.getId());
+        }
 
         updateGameResultFields(gameResult, gameResultDto);
         updateGameReviewFields(gameReview, gameReviewDto);

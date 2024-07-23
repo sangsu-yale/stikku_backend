@@ -58,8 +58,6 @@ public class UserService {
         }
     }
 
-    // TODO : userService - getUserGames
-
     private boolean isValidEmail(String email) {
         return email != null && email.contains("@");
     }

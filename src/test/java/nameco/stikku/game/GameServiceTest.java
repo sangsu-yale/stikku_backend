@@ -19,6 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -124,6 +126,34 @@ class GameServiceTest {
         assertThatThrownBy(() -> gameService.getGameById(1L))
                 .isInstanceOf(GameResultNotFoundException.class)
                 .hasMessageMatching(".*id 1.*");
+    }
+
+    @Test
+    @DisplayName("[게임 조회] 특정 유저의 모든 게임 조회")
+    void getAllGameByUserId() {
+        User user = new User();
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        GameResult gameResult1 = createTestGameResult(1L);
+        GameResult gameResult2 = createTestGameResult(2L);
+        GameReview gameReview1 = createTestGameReview(1L, 1L);
+
+        List<GameResult> gameResults = new ArrayList<>();
+        gameResults.add(gameResult1);
+        gameResults.add(gameResult2);
+
+        when(gameResultRepository.findGameResultByUserId(1L)).thenReturn(gameResults);
+        when(gameReviewRepository.findByGameResultId(1L)).thenReturn(Optional.of(gameReview1));
+        when(gameReviewRepository.save(any(GameReview.class))).thenReturn(gameReview1);
+
+        List<GameResponseDto> allGameByUserId = gameService.getAllGameByUserId(1L);
+
+        assertThat(allGameByUserId).isNotNull();
+        assertThat(allGameByUserId.size()).isEqualTo(2);
+        assertThat(allGameByUserId.get(0).getGameResult()).isEqualTo(gameResult1);
+        assertThat(allGameByUserId.get(1).getGameResult()).isEqualTo(gameResult2);
+        assertThat(allGameByUserId.get(0).getGameReview()).isEqualTo(gameReview1);
+
     }
 
     @Test
