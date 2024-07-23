@@ -6,6 +6,7 @@ import nameco.stikku.advice.exception.MissingFieldException;
 import nameco.stikku.game.domain.GameResult;
 import nameco.stikku.game.domain.GameReview;
 import nameco.stikku.game.dto.*;
+import nameco.stikku.user.User;
 import nameco.stikku.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,7 +76,10 @@ public class GameService {
 
     public List<GameResponseDto> getAllGameByUserId(Long userId) {
         List<GameResponseDto> gameResponseDtos = new ArrayList<>();
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        Optional<User> userOptional = userRepository.findById(userId);
+        if(userOptional.isEmpty()){
+            return new ArrayList<>();
+        }
 
         List<GameResult> gameResults = gameResultRepository.findGameResultByUserId(userId);
         for(GameResult gameResult : gameResults) {
@@ -132,6 +136,7 @@ public class GameService {
         GameResult saved = gameResultRepository.save(gameResult);
         return saved.getIsFavorite();
     }
+
     @Transactional
     public String deleteGame(Long gameId) {
         GameResult gameResult = gameResultRepository.findById(gameId)
@@ -144,6 +149,19 @@ public class GameService {
         }
 
         return gameId.toString();
+    }
+
+    @Transactional
+    public String deleteAllGameByUser(Long userId) {
+        List<GameResult> gameResults = gameResultRepository.findGameResultByUserId(userId);
+        for(GameResult gameResult : gameResults) {
+            Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameResult.getId());
+            if(gameReviewOptional.isPresent()){
+                gameReviewRepository.deleteById(gameReviewOptional.get().getId());
+            }
+            gameResultRepository.deleteById(gameResult.getId());
+        }
+        return userId.toString();
     }
 
     private void updateGameResultFields(GameResult gameResult, GameResultDto gameResultDto) {

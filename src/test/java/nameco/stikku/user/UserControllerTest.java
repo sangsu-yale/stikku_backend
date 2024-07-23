@@ -2,12 +2,14 @@ package nameco.stikku.user;
 
 import nameco.stikku.game.GameResultRepository;
 import nameco.stikku.game.GameReviewRepository;
+import nameco.stikku.game.GameService;
 import nameco.stikku.game.domain.GameResult;
 import nameco.stikku.game.domain.GameReview;
 import nameco.stikku.game.dto.GameRequestDto;
 import nameco.stikku.game.dto.GameResultDto;
 import nameco.stikku.game.dto.GameReviewDto;
 import nameco.stikku.user.dto.UserDTO;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -44,6 +47,9 @@ class UserControllerTest {
 
     @Autowired
     private GameReviewRepository gameReviewRepository;
+
+    @Autowired
+    private GameService gameService;
 
     @BeforeEach
     void setUp() {
@@ -131,13 +137,25 @@ class UserControllerTest {
         User user = new User();
         user.setUsername("testuser");
         user.setEmail("test@example.com");
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        mockMvc.perform(delete("/users/{user_id}", user.getId())
+        GameResult gameResult1 = createTestGameResult(1L);
+        gameResult1.setUserId(savedUser.getId());
+        GameResult gameResult2 = createTestGameResult(1L);
+        gameResult2.setUserId(savedUser.getId());
+        GameResult savedGameResult1 = gameResultRepository.save(gameResult1);
+        gameResultRepository.save(gameResult2);
+
+        GameReview gameReview1 = createTestGameReview(1L, savedGameResult1.getId());
+        gameReviewRepository.save(gameReview1);
+
+        mockMvc.perform(delete("/users/{user_id}", savedUser.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", containsString("User " + user.getId() + " deleted successfully")))
                 .andDo(print());
+
+        assertThat(gameService.getAllGameByUserId(savedUser.getId()).size()).isEqualTo(0);
     }
 
     @Test
@@ -148,6 +166,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message", containsString("User not found with id 1")))
                 .andDo(print());
     }
+
 
     private GameResult createTestGameResult(Long id) {
 

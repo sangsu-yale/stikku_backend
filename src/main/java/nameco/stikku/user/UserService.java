@@ -1,5 +1,6 @@
 package nameco.stikku.user;
 
+import nameco.stikku.game.GameService;
 import nameco.stikku.user.dto.UserDTO;
 import nameco.stikku.advice.exception.InvalidUserDataException;
 import nameco.stikku.advice.exception.UserNotFoundException;
@@ -10,10 +11,12 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final GameService gameService;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, GameService gameService) {
         this.userRepository = userRepository;
+        this.gameService = gameService;
     }
 
     // TODO : userService - createUser
@@ -48,10 +51,10 @@ public class UserService {
     }
 
     public String deleteUser(Long userId) {
-        // TODO : userServie - 권한 확인 필요
+        // TODO : userService - 권한 확인 필요
         if (userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
-            // TODO : userService - 게임 삭제 필요
+            gameService.deleteAllGameByUser(userId);
             return userId.toString();
         } else {
             throw new UserNotFoundException(userId.toString());
