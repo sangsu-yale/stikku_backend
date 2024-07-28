@@ -7,6 +7,8 @@ import nameco.stikku.advice.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -19,10 +21,25 @@ public class UserService {
         this.gameService = gameService;
     }
 
-    // TODO : userService - createUser
+    public User createUser(UserDTO userDTO){
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setProfileImage(userDTO.getProfileImage());
+        User savedUser = userRepository.save(user);
+        return savedUser;
+    }
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     public User updateUser(Long userId, UserDTO userDTO) {

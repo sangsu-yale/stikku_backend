@@ -1,9 +1,11 @@
 package nameco.stikku.game;
 
+import nameco.stikku.advice.exception.AccesDeniedException;
 import nameco.stikku.game.dto.FavoriteUpdateDto;
 import nameco.stikku.game.dto.GameRequestDto;
 import nameco.stikku.game.dto.GameResponseDto;
 import nameco.stikku.game.dto.GameReviewDto;
+import nameco.stikku.resolver.Auth;
 import nameco.stikku.responseDto.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,11 @@ public class GameController {
     }
 
     @PostMapping
-    public ResponseEntity<GameResponseDto> createGame(@RequestBody GameRequestDto gameRequestDto) {
+    public ResponseEntity<GameResponseDto> createGame(@Auth String tokenUserId, @RequestBody GameRequestDto gameRequestDto) {
+        if(!tokenUserId.equals(gameRequestDto.getGameResult().getUserId().toString())){
+            throw new AccesDeniedException("권한이 없습니다.");
+        }
+
         return new ResponseEntity<>(gameService.createGame(gameRequestDto), HttpStatus.CREATED);
     }
 
@@ -33,18 +39,27 @@ public class GameController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GameResponseDto> updateGame(@PathVariable("id") Long id, @RequestBody GameRequestDto gameRequestDto) {
+    public ResponseEntity<GameResponseDto> updateGame(@Auth String tokenUserId, @PathVariable("id") Long id, @RequestBody GameRequestDto gameRequestDto) {
+        if(!tokenUserId.equals(gameRequestDto.getGameResult().getUserId().toString())){
+            throw new AccesDeniedException("권한이 없습니다.");
+        }
         return new ResponseEntity<>(gameService.updateGame(id, gameRequestDto), HttpStatus.OK);
     }
 
-    @PatchMapping("/{id}/favorite")
-    public ResponseEntity<Void> updateGameFavorite(@PathVariable("id") Long id, @RequestBody FavoriteUpdateDto favoriteUpdateDto) {
+    @PutMapping("/{id}/favorite")
+    public ResponseEntity<Void> updateGameFavorite(@Auth String tokenUserId, @PathVariable("id") Long id, @RequestBody FavoriteUpdateDto favoriteUpdateDto) {
+        if (!tokenUserId.equals(gameService.getGameById(id).getGameResult().getUserId().toString())) {
+            throw new AccesDeniedException("권한이 없습니다.");
+        }
         gameService.updateFavorite(id, favoriteUpdateDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponse> deleteGame(@PathVariable("id") Long id){
+    public ResponseEntity<MessageResponse> deleteGame(@Auth String tokenUserId, @PathVariable("id") Long id){
+        if (!tokenUserId.equals(gameService.getGameById(id).getGameResult().getUserId().toString())) {
+            throw new AccesDeniedException("권한이 없습니다.");
+        }
         String deletedGameId = gameService.deleteGame(id);
         return new ResponseEntity<>(new MessageResponse("Game " + deletedGameId + " deleted successfully"), HttpStatus.OK);
     }

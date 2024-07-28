@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name="game_results")
-@Getter @Setter
 public class GameResult {
     public GameResult() {
 
@@ -39,7 +38,7 @@ public class GameResult {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name="user_id", nullable = false)
     private Long userId;
 
     @Column(nullable = false)
@@ -82,7 +81,7 @@ public class GameResult {
     private String pictureUrl;
 
     @Column(name = "is_favorite")
-    private Boolean isFavorite;
+    private Boolean isFavorite = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -109,4 +108,147 @@ public class GameResult {
         RAIN,
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public GameResultStatus getResult() {
+        return result;
+    }
+
+    public boolean getIsLiveView() {
+        return isLiveView;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public String getStadium() {
+        return stadium;
+    }
+
+    public String getSeatLocation() {
+        return seatLocation;
+    }
+
+    public String getTeam1() {
+        return team1;
+    }
+
+    public String getTeam2() {
+        return team2;
+    }
+
+    public Integer getScore1() {
+        return score1;
+    }
+
+    public Integer getScore2() {
+        return score2;
+    }
+
+    public boolean getIsTeam1IsMyteam() {
+        return team1IsMyteam;
+    }
+
+    public boolean getIsTeam2IsMyteam() {
+        return team2IsMyteam;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
+
+    public Boolean getIsFavorite() {
+        return isFavorite;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public void setResult(GameResultStatus result) {
+        this.result = result;
+    }
+
+    public void setIsLiveView(boolean liveView) {
+        isLiveView = liveView;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public void setStadium(String stadium) {
+        this.stadium = stadium;
+    }
+
+    public void setSeatLocation(String seatLocation) {
+        this.seatLocation = seatLocation;
+    }
+
+    public void setTeam1(String team1) {
+        this.team1 = team1;
+    }
+
+    public void setTeam2(String team2) {
+        this.team2 = team2;
+    }
+
+    public void setScore1(Integer score1) {
+        this.score1 = score1;
+    }
+
+    public void setScore2(Integer score2) {
+        this.score2 = score2;
+    }
+
+    public void setTeam1IsMyteam(boolean team1IsMyteam) {
+        this.team1IsMyteam = team1IsMyteam;
+    }
+
+    public void setTeam2IsMyteam(boolean team2IsMyteam) {
+        this.team2IsMyteam = team2IsMyteam;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
+    }
+
+    public void setIsFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

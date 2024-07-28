@@ -13,7 +13,7 @@ public class Setting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "userId", updatable = false)
+    @Column(name = "user_id", updatable = false)
     private Long userId;
 
     @Column(name="is_dark_mode")

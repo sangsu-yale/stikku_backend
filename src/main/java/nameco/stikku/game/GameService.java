@@ -123,7 +123,8 @@ public class GameService {
         updateGameResultFields(gameResult, gameResultDto);
         updateGameReviewFields(gameReview, gameReviewDto);
 
-        gameResultRepository.save(gameResult);
+        GameResult saved = gameResultRepository.save(gameResult);
+        System.out.println("saved = " + saved);
         gameReviewRepository.save(gameReview);
 
         return new GameResponseDto(gameResult, gameReview);
@@ -132,7 +133,7 @@ public class GameService {
     @Transactional
     public boolean updateFavorite(Long gameId, FavoriteUpdateDto favoriteUpdateDto) {
         GameResult gameResult = gameResultRepository.findById(gameId).orElseThrow(() -> new GameResultNotFoundException(gameId.toString()));
-        gameResult.setIsFavorite(favoriteUpdateDto.isFavorite());
+        gameResult.setIsFavorite(favoriteUpdateDto.getIsFavorite());
         GameResult saved = gameResultRepository.save(gameResult);
         return saved.getIsFavorite();
     }
@@ -167,7 +168,7 @@ public class GameService {
     private void updateGameResultFields(GameResult gameResult, GameResultDto gameResultDto) {
         gameResult.setUserId(gameResultDto.getUserId());
         gameResult.setResult(gameResultDto.getResult());
-        gameResult.setLiveView(gameResultDto.isLiveView());
+        gameResult.setIsLiveView(gameResultDto.isLiveView());
         gameResult.setDate(gameResultDto.getDate());
         gameResult.setTeam1(gameResultDto.getTeam1());
         gameResult.setTeam2(gameResultDto.getTeam2());
@@ -176,7 +177,11 @@ public class GameService {
         gameResult.setTeam1IsMyteam(gameResultDto.isTeam1IsMyTeam());
         gameResult.setTeam2IsMyteam(gameResultDto.isTeam2IsMyTeam());
         gameResult.setComment(gameResultDto.getComment());
+        gameResult.setTitle(gameResultDto.getTitle());
         gameResult.setPictureUrl(gameResultDto.getPictureUrl());
+        gameResult.setStadium(gameResultDto.getStadium());
+        gameResult.setSeatLocation(gameResultDto.getSeatLocation());
+
     }
 
     private void updateGameReviewFields(GameReview gameReview, GameReviewDto gameReviewDto) {
