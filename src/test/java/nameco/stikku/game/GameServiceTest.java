@@ -56,7 +56,6 @@ class GameServiceTest {
         when(userRepository.findById(gameRequestDto.getGameResult().getUserId())).thenReturn(Optional.of(new User()));
         when(gameResultRepository.save(any(GameResult.class))).thenAnswer(invocation -> {
             GameResult gameResult = invocation.getArgument(0);
-            gameResult.setId(1L);
             return gameResult;
         });
 
@@ -207,13 +206,12 @@ class GameServiceTest {
 
         when(gameResultRepository.save(any(GameResult.class))).thenAnswer(invocation -> {
             GameResult gameResult1 = invocation.getArgument(0);
-            gameResult.setId(1L);
             return gameResult;
         });
 
         when(gameResultRepository.findById(1L)).thenReturn(Optional.of(gameResult));
         FavoriteUpdateDto favoriteUpdateDto = new FavoriteUpdateDto();
-        favoriteUpdateDto.setFavorite(true);
+        favoriteUpdateDto.setIsFavorite(true);
 
         boolean updatedFavorite = gameService.updateFavorite(1L, favoriteUpdateDto);
 
@@ -228,13 +226,12 @@ class GameServiceTest {
 
         when(gameResultRepository.save(any(GameResult.class))).thenAnswer(invocation -> {
             GameResult gameResult1 = invocation.getArgument(0);
-            gameResult.setId(1L);
             return gameResult;
         });
 
         when(gameResultRepository.findById(1L)).thenReturn(Optional.of(gameResult));
         FavoriteUpdateDto favoriteUpdateDto = new FavoriteUpdateDto();
-        favoriteUpdateDto.setFavorite(false);
+        favoriteUpdateDto.setIsFavorite(false);
 
         boolean updatedFavorite = gameService.updateFavorite(1L, favoriteUpdateDto);
 
@@ -247,7 +244,7 @@ class GameServiceTest {
 
         when(gameResultRepository.findById(1L)).thenReturn(Optional.empty());
         FavoriteUpdateDto favoriteUpdateDto = new FavoriteUpdateDto();
-        favoriteUpdateDto.setFavorite(true);
+        favoriteUpdateDto.setIsFavorite(true);
 
         assertThatThrownBy(() -> gameService.updateFavorite(1L, favoriteUpdateDto))
                 .isInstanceOf(GameResultNotFoundException.class)
@@ -284,10 +281,9 @@ class GameServiceTest {
     private GameResult createTestGameResult(Long id) {
 
         GameResult gameResult = new GameResult();
-        gameResult.setId(id);
         gameResult.setUserId(1L);
         gameResult.setResult(GameResult.GameResultStatus.WIN);
-        gameResult.setLiveView(true);
+        gameResult.setIsLiveView(true);
         gameResult.setDate(LocalDate.now());
         gameResult.setTeam1("삼성 라이온즈");
         gameResult.setTeam2("기아 타이거즈");

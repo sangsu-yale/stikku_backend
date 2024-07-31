@@ -171,10 +171,9 @@ class UserControllerTest {
     private GameResult createTestGameResult(Long id) {
 
         GameResult gameResult = new GameResult();
-        gameResult.setId(id);
         gameResult.setUserId(1L);
         gameResult.setResult(GameResult.GameResultStatus.WIN);
-        gameResult.setLiveView(true);
+        gameResult.setIsLiveView(true);
         gameResult.setDate(LocalDate.now());
         gameResult.setTeam1("삼성 라이온즈");
         gameResult.setTeam2("기아 타이거즈");
