@@ -48,6 +48,7 @@ public class SettingService {
             setting = settingOptional.get();
         }
 
+
         if (settingUpdateDto.getIsDarkMode() != setting.getIsDarkMode()) {
             setting.setIsDarkMode(settingUpdateDto.getIsDarkMode());
         }

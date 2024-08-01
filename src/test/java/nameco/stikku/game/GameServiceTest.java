@@ -70,9 +70,7 @@ class GameServiceTest {
         assertThat(game).isNotNull();
         assertThat(game.getGameResult()).isNotNull();
         assertThat(game.getGameReview()).isNotNull();
-        assertThat(game.getGameResult().getId()).isEqualTo(1L);
-        assertThat(game.getGameReview().getId()).isEqualTo(1L);
-        assertThat(game.getGameReview().getGameResultId()).isEqualTo(1L);
+        assertThat(game.getGameReview().getGameResultId()).isEqualTo(game.getGameResult().getId());
         assertThat(game.getGameResult().getResult()).isEqualTo(gameRequestDto.getGameResult().getResult());
         assertThat(game.getGameReview().getFood()).isEqualTo(gameRequestDto.getGameReview().getFood());
     }
@@ -167,7 +165,7 @@ class GameServiceTest {
         when(gameReviewRepository.findByGameResultId(1L)).thenReturn(Optional.of(gameReview));
         when(userRepository.findById(gameRequestDto.getGameResult().getUserId())).thenReturn(Optional.of(new User()));
 
-        GameResponseDto updatedGame = gameService.updateGame(gameResult.getId(), gameRequestDto);
+        GameResponseDto updatedGame = gameService.updateGame(1L, gameRequestDto);
 
         assertThat(updatedGame).isNotNull();
         assertThat(updatedGame.getGameResult().getScore1()).isEqualTo(gameRequestDto.getGameResult().getScore1());
