@@ -60,7 +60,7 @@ public class GameReview {
     public enum Mood {
         HAPPY,
         SURPRISED,
-        ASTONISHED,
+        ANGRY,
         BORED,
         FUN,
     }
