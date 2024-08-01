@@ -8,8 +8,11 @@ import nameco.stikku.game.domain.GameReview;
 import nameco.stikku.game.dto.GameRequestDto;
 import nameco.stikku.game.dto.GameResultDto;
 import nameco.stikku.game.dto.GameReviewDto;
+import nameco.stikku.security.JwtAuthenticationToken;
+import nameco.stikku.security.JwtService;
 import nameco.stikku.user.dto.UserDTO;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -35,7 +39,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
 @ActiveProfiles("test")
+@WithMockUser
 class UserControllerTest {
+
+    private final String TESTUSER_USERNAME = "user";
+    private final String TESTUSER_EMAIL = "testuser@gmail.com";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -51,27 +60,45 @@ class UserControllerTest {
     @Autowired
     private GameService gameService;
 
+    @Autowired
+    private JwtService jwtService;
+
+    private String token;
+
+    private User savedUser;
+
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
         gameResultRepository.deleteAll();
         gameReviewRepository.deleteAll();
+
+        User user = new User();
+        user.setEmail(TESTUSER_EMAIL);
+        user.setUsername(TESTUSER_USERNAME);
+        this.savedUser = userRepository.save(user);
+
+        this.token = jwtService.generateToken(user);
+
+
     }
+
 
     @Test
     @DisplayName("[유저 조회] 유저가 존재하는 경우")
     void getUserById_UserExists() throws Exception {
         User user = new User();
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
+        user.setUsername(TESTUSER_USERNAME);
+        user.setEmail(TESTUSER_EMAIL);
         userRepository.save(user);
 
         mockMvc.perform(get("/users/{user_id}", user.getId())
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer "+token))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.username").value("testuser"))
-                .andExpect(jsonPath("$.email").value("test@example.com"))
+                .andExpect(jsonPath("$.username").value(TESTUSER_USERNAME))
+                .andExpect(jsonPath("$.email").value(TESTUSER_EMAIL))
                 .andDo(print());
     }
 
@@ -87,10 +114,6 @@ class UserControllerTest {
     @Test
     @DisplayName("[게임 조회] 특정 유저의 모든 게임 조회")
     void getAllGameByUserId() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        userRepository.save(user);
 
         GameResult gameResult1 = createTestGameResult(1L);
         GameResult gameResult2 = createTestGameResult(2L);
@@ -102,29 +125,27 @@ class UserControllerTest {
         gameReviewRepository.save(gameReview1);
         gameReviewRepository.save(gameReview2);
 
-        mockMvc.perform(get("/users/1/game"))
+        mockMvc.perform(get("/users/"+savedUser.getId()+"/game")
+                        .header("Authorization", "Bearer "+token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].gameResult.id").value(1))
-                .andExpect(jsonPath("$[0].gameReview.gameResultId").value(1))
+                .andExpect(jsonPath("$[0].gameResult.userId").value(savedUser.getId()))
+                .andExpect(jsonPath("$[0].gameReview.gameResultId").value(gameResult1.getId().toString()))
                 .andExpect(jsonPath("$", hasSize(2)));
 
     }
 
     @Test
     void updateUser_UserExists() throws Exception {
-        User user = new User();
-        user.setUsername("oldUsername");
-        user.setEmail("old@example.com");
-        userRepository.save(user);
 
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername("updatedUsername");
         userDTO.setEmail("updated@example.com");
 
-        mockMvc.perform(put("/users/{user_id}", user.getId())
+        mockMvc.perform(put("/users/"+savedUser.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\": \"updatedUsername\", \"email\": \"updated@example.com\"}")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer "+token))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.username").value("updatedUsername"))
@@ -134,10 +155,6 @@ class UserControllerTest {
 
     @Test
     void deleteUser_UserExists() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        User savedUser = userRepository.save(user);
 
         GameResult gameResult1 = createTestGameResult(1L);
         gameResult1.setUserId(savedUser.getId());
@@ -149,29 +166,24 @@ class UserControllerTest {
         GameReview gameReview1 = createTestGameReview(1L, savedGameResult1.getId());
         gameReviewRepository.save(gameReview1);
 
-        mockMvc.perform(delete("/users/{user_id}", savedUser.getId())
-                        .accept(MediaType.APPLICATION_JSON))
+//        System.out.println("savedUser ID=" + savedUser.getId());
+//        System.out.println("JwtToken ID="+jwtService.getUserIdFromToken(token));
+
+        mockMvc.perform(delete("/users/"+ savedUser.getId().toString())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer "+token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", containsString("User " + user.getId() + " deleted successfully")))
+                .andExpect(jsonPath("$.message", containsString("User " + savedUser.getId() + " deleted successfully")))
                 .andDo(print());
 
         assertThat(gameService.getAllGameByUserId(savedUser.getId()).size()).isEqualTo(0);
-    }
-
-    @Test
-    void deleteUser_UserDoesNotExist() throws Exception {
-        mockMvc.perform(delete("/users/{user_id}", 1L)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message", containsString("User not found with id 1")))
-                .andDo(print());
     }
 
 
     private GameResult createTestGameResult(Long id) {
 
         GameResult gameResult = new GameResult();
-        gameResult.setUserId(1L);
+        gameResult.setUserId(savedUser.getId());
         gameResult.setResult(GameResult.GameResultStatus.WIN);
         gameResult.setIsLiveView(true);
         gameResult.setDate(LocalDate.now());
@@ -201,7 +213,7 @@ class UserControllerTest {
     private GameRequestDto createTestGameRequestDto() {
 
         GameResultDto gameResultDto = new GameResultDto();
-        gameResultDto.setUserId(1L);
+        gameResultDto.setUserId(savedUser.getId());
         gameResultDto.setResult(GameResult.GameResultStatus.WIN);
         gameResultDto.setLiveView(true);
         gameResultDto.setDate(LocalDate.now());

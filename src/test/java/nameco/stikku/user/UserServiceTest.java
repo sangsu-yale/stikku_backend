@@ -1,5 +1,6 @@
 package nameco.stikku.user;
 
+import nameco.stikku.game.GameService;
 import nameco.stikku.user.dto.UserDTO;
 import nameco.stikku.advice.exception.InvalidUserDataException;
 import nameco.stikku.advice.exception.UserNotFoundException;
@@ -24,6 +25,9 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private GameService gameService;
 
     @BeforeEach
     public void beforeEach() {
@@ -142,6 +146,7 @@ class UserServiceTest {
     @DisplayName("[유저 삭제] 유저가 존재하는 경우 정상 삭제")
     void deleteUser_UserExists() {
         when(userRepository.existsById(1L)).thenReturn(true);
+        when(gameService.deleteAllGameByUser(1L)).thenReturn("1");
         doNothing().when(userRepository).deleteById(1L);
 
         String result = userService.deleteUser(1L);
