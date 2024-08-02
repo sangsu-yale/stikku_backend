@@ -47,12 +47,6 @@ public class SecurityConfig {
                                 .baseUri("/login/oauth2/code/google"))
                         .defaultSuccessUrl("/login/oauth2/code/google/callback")
                 )
-                // logout: 로그아웃 url과 로그아웃 성공 후 리다이렉션 URL 정의
-                .logout(logout -> logout
-                        .logoutUrl("/login/oauth2/code/google/logout")
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessUrl("/").permitAll())
-
                 // csrf: CSRF 보호 비활성화
                 .csrf(csrf -> csrf
                         .disable()

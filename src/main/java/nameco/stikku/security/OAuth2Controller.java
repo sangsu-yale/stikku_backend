@@ -1,6 +1,6 @@
 package nameco.stikku.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -88,7 +88,7 @@ public class OAuth2Controller {
 
             }
 
-            UserInfoDto userInfoDto = new UserInfoDto(user.getUsername(), user.getEmail(), userAuthentication.getProvider(), userAuthentication.getProviderId());
+            UserInfoDto userInfoDto = new UserInfoDto(user.getId(), user.getUsername(), user.getEmail(), userAuthentication.getProvider(), userAuthentication.getProviderId());
             loginResponseDto.setUserInfo(userInfoDto);
             loginResponseDto.setToken(jwtService.generateToken(user));
 
@@ -105,6 +105,13 @@ public class OAuth2Controller {
     public ResponseEntity<Object> logout(HttpServletRequest request, HttpServletResponse response) {
         SecurityContextHolder.clearContext();
         request.getSession().invalidate();
+
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", "로그아웃 성공");
         return ResponseEntity.ok(responseBody);
