@@ -88,7 +88,7 @@ public class OAuth2Controller {
 
             }
 
-            UserInfoDto userInfoDto = new UserInfoDto(user.getUsername(), user.getEmail(), userAuthentication.getProvider(), userAuthentication.getProviderId());
+            UserInfoDto userInfoDto = new UserInfoDto(user.getId(), user.getUsername(), user.getEmail(), userAuthentication.getProvider(), userAuthentication.getProviderId());
             loginResponseDto.setUserInfo(userInfoDto);
             loginResponseDto.setToken(jwtService.generateToken(user));
 
