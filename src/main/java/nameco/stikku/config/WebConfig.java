@@ -1,7 +1,7 @@
 package nameco.stikku.config;
 
+import nameco.stikku.auth.google.GoogleAuthController;
 import nameco.stikku.resolver.AuthArgumentResolver;
-import nameco.stikku.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -12,10 +12,10 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final JwtService jwtService;
+    private final GoogleAuthController.JwtService jwtService;
 
     @Autowired
-    public WebConfig(JwtService jwtService) {
+    public WebConfig(GoogleAuthController.JwtService jwtService) {
         this.jwtService = jwtService;
     }
 

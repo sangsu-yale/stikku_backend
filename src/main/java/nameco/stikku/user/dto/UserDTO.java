@@ -8,4 +8,13 @@ public class UserDTO {
     private String username;
     private String email;
     private String profileImage;
+
+    public UserDTO() {
+    }
+
+    public UserDTO(String username, String email, String profileImage) {
+        this.username = username;
+        this.email = email;
+        this.profileImage = profileImage;
+    }
 }
