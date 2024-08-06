@@ -1,5 +1,6 @@
 package nameco.stikku.user;
 
+import nameco.stikku.auth.google.dto.GoogleUserInfoDto;
 import nameco.stikku.game.GameService;
 import nameco.stikku.user.dto.UserDTO;
 import nameco.stikku.advice.exception.InvalidUserDataException;
@@ -19,6 +20,11 @@ public class UserService {
     public UserService(UserRepository userRepository, GameService gameService) {
         this.userRepository = userRepository;
         this.gameService = gameService;
+    }
+
+    public User findOrCreateUser(GoogleUserInfoDto googleUserInfoDto) {
+        return userRepository.findUserByEmail(googleUserInfoDto.getEmail())
+                .orElseGet(() -> createUser(new UserDTO(googleUserInfoDto.getName(), googleUserInfoDto.getEmail(), googleUserInfoDto.getPicture())));
     }
 
     public User createUser(UserDTO userDTO){
