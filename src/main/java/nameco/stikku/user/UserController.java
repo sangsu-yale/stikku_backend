@@ -41,12 +41,7 @@ public class UserController {
         if(authorization != null && authorization.startsWith("Bearer")){
             String token = authorization.substring(7);
             User user = userService.getUserByAccessToken(token);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setContentType(MediaType.valueOf("application/json; charset=utf-8"));
-
-            return new ResponseEntity<>(user, headers, HttpStatus.OK);
+            return new ResponseEntity<>(user, HttpStatus.OK);
         } else {
             throw new AccesDeniedException("액세스 토큰이 없거나 유효하지 않습니다.");
         }
