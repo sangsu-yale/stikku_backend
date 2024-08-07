@@ -8,7 +8,9 @@ import nameco.stikku.resolver.Auth;
 import nameco.stikku.responseDto.MessageResponse;
 import nameco.stikku.user.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +41,12 @@ public class UserController {
         if(authorization != null && authorization.startsWith("Bearer")){
             String token = authorization.substring(7);
             User user = userService.getUserByAccessToken(token);
-            return new ResponseEntity<>(user, HttpStatus.OK);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentType(MediaType.valueOf("application/json; charset=utf-8"));
+
+            return new ResponseEntity<>(user, headers, HttpStatus.OK);
         } else {
             throw new AccesDeniedException("액세스 토큰이 없거나 유효하지 않습니다.");
         }
