@@ -1,7 +1,7 @@
 package nameco.stikku.setting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nameco.stikku.security.JwtService;
+import nameco.stikku.auth.google.JwtService;
 import nameco.stikku.setting.dto.SettingUpdateDto;
 import nameco.stikku.user.User;
 import nameco.stikku.user.UserRepository;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@WithMockUser
 class SettingControllerTest {
 
     private final String TESTUSER_USERNAME = "user";

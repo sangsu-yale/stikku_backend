@@ -2,7 +2,7 @@ package nameco.stikku.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import nameco.stikku.advice.exception.AccesDeniedException;
-import nameco.stikku.auth.google.GoogleAuthController;
+import nameco.stikku.auth.google.JwtService;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -11,9 +11,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final GoogleAuthController.JwtService jwtService;
+    private final JwtService jwtService;
 
-    public AuthArgumentResolver(GoogleAuthController.JwtService jwtService) {
+    public AuthArgumentResolver(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 

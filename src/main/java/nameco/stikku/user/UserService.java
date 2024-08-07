@@ -1,5 +1,6 @@
 package nameco.stikku.user;
 
+import nameco.stikku.auth.google.JwtService;
 import nameco.stikku.auth.google.dto.GoogleUserInfoDto;
 import nameco.stikku.game.GameService;
 import nameco.stikku.user.dto.UserDTO;
@@ -8,18 +9,18 @@ import nameco.stikku.advice.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final GameService gameService;
+    private final JwtService jwtService;
 
     @Autowired
-    public UserService(UserRepository userRepository, GameService gameService) {
+    public UserService(UserRepository userRepository, GameService gameService, JwtService jwtService) {
         this.userRepository = userRepository;
         this.gameService = gameService;
+        this.jwtService = jwtService;
     }
 
     public User findOrCreateUser(GoogleUserInfoDto googleUserInfoDto) {
@@ -42,6 +43,16 @@ public class UserService {
 
     public User getUserByEmail(String email) {
         return userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+    }
+
+    public User getUserByAccessToken(String accessToken) {
+        if (jwtService.validateToken(accessToken)) {
+            String userId = jwtService.getUserIdFromToken(accessToken);
+
+            return getUserById(Long.parseLong(userId));
+        } else {
+            throw new UserNotFoundException(accessToken);
+        }
     }
 
     public boolean existsByEmail(String email) {
