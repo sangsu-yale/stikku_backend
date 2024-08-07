@@ -19,7 +19,6 @@ public class GoogleAuthService {
 
     public GoogleUserInfoDto getUserInfoFromAccessToken(String accessToken) {
         String url = USER_INFO_URI + "access_token="+ accessToken;
-        System.out.println("url = " + url);
         GoogleUserInfoDto googleUserInfo = restTemplate.getForObject(url, GoogleUserInfoDto.class);
 
         return googleUserInfo;

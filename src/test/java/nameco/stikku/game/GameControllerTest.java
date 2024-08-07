@@ -3,13 +3,13 @@ package nameco.stikku.game;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import nameco.stikku.auth.google.JwtService;
 import nameco.stikku.game.domain.GameResult;
 import nameco.stikku.game.domain.GameReview;
 import nameco.stikku.game.dto.FavoriteUpdateDto;
 import nameco.stikku.game.dto.GameRequestDto;
 import nameco.stikku.game.dto.GameResultDto;
 import nameco.stikku.game.dto.GameReviewDto;
-import nameco.stikku.security.JwtService;
 import nameco.stikku.setting.Setting;
 import nameco.stikku.user.User;
 import nameco.stikku.user.UserRepository;
@@ -22,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,7 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@WithMockUser
 public class GameControllerTest {
 
     private final String TESTUSER_USERNAME = "user";

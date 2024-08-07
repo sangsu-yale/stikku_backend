@@ -1,5 +1,6 @@
 package nameco.stikku.user;
 
+import nameco.stikku.auth.google.JwtService;
 import nameco.stikku.game.GameResultRepository;
 import nameco.stikku.game.GameReviewRepository;
 import nameco.stikku.game.GameService;
@@ -8,8 +9,6 @@ import nameco.stikku.game.domain.GameReview;
 import nameco.stikku.game.dto.GameRequestDto;
 import nameco.stikku.game.dto.GameResultDto;
 import nameco.stikku.game.dto.GameReviewDto;
-import nameco.stikku.security.JwtAuthenticationToken;
-import nameco.stikku.security.JwtService;
 import nameco.stikku.user.dto.UserDTO;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -21,7 +20,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
 @ActiveProfiles("test")
-@WithMockUser
 class UserControllerTest {
 
     private final String TESTUSER_USERNAME = "user";

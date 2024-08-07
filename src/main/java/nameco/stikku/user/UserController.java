@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-
     private final UserService userService;
     private final GameService gameService;
 
@@ -32,6 +31,18 @@ public class UserController {
     @GetMapping("/{user_id}")
     public ResponseEntity<User> getUserById(@PathVariable("user_id") Long userId) {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<User> getUserByAccessToken(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if(authorization != null && authorization.startsWith("Bearer")){
+            String token = authorization.substring(7);
+            User user = userService.getUserByAccessToken(token);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            throw new AccesDeniedException("액세스 토큰이 없거나 유효하지 않습니다.");
+        }
     }
 
     @GetMapping("/{user_id}/game")
