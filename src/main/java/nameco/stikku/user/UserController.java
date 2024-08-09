@@ -3,6 +3,7 @@ package nameco.stikku.user;
 import jakarta.servlet.http.HttpServletRequest;
 import nameco.stikku.advice.exception.AccesDeniedException;
 import nameco.stikku.game.GameService;
+import nameco.stikku.game.dto.GameRequestDto;
 import nameco.stikku.game.dto.GameResponseDto;
 import nameco.stikku.resolver.Auth;
 import nameco.stikku.responseDto.MessageResponse;
@@ -12,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -65,5 +65,14 @@ public class UserController {
         }
         String deletedUserId = userService.deleteUser(userId);
         return new ResponseEntity<>(new MessageResponse("User " + deletedUserId + " deleted successfully"), HttpStatus.OK);
+    }
+
+    @PostMapping("/{user_id}/game/sync")
+    public ResponseEntity<?> syncGame(@Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody List<GameRequestDto> games) {
+        if (!tokenUserId.equals(userId.toString())) {
+            throw new AccesDeniedException("권한이 없습니다.");
+        }
+        List<GameResponseDto> gameResponseDtos = gameService.syncGame(userId, games);
+        return new ResponseEntity<>(gameResponseDtos, HttpStatus.CREATED);
     }
 }
