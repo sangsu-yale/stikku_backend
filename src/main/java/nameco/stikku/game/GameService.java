@@ -165,6 +165,46 @@ public class GameService {
         return userId.toString();
     }
 
+    @Transactional
+    public List<GameResponseDto> syncGame(Long userId, List<GameRequestDto> gameRequestDtos) {
+        List<GameResult> gameResults = new ArrayList<>();
+        List<GameReview> gameReviews = new ArrayList<>();
+
+
+        for(GameRequestDto gameRequestDto : gameRequestDtos) {
+
+            GameResultDto gameResultDto = gameRequestDto.getGameResult();
+
+            // 1. 유효성 검사 - 필수값이 다 들어가 있는지 확인
+            validateGameRequestDto(gameRequestDto);
+
+            // 2. 유효성 검사 - 유효한 userId인지 확인
+            userRepository.findById(gameResultDto.getUserId())
+                    .orElseThrow(() -> new UserNotFoundException(gameResultDto.getUserId().toString()));
+
+            // 3. game result 저장
+            GameResult gameResult = new GameResult();
+            updateGameResultFields(gameResult, gameResultDto);
+            gameResults.add(gameResult);
+
+        }
+
+        List<GameResult> savedGameResults = gameResultRepository.saveAll(gameResults);
+
+        for (int i = 0; i < savedGameResults.size(); i++) {
+            // 4. game review 저장
+            GameReview gameReview = new GameReview();
+            gameReview.setGameResultId(savedGameResults.get(i).getId());
+            updateGameReviewFields(gameReview, gameRequestDtos.get(i).getGameReview());
+            gameReviews.add(gameReview);
+        }
+
+        List<GameReview> savedGameReviews = gameReviewRepository.saveAll(gameReviews);
+
+        return getAllGameByUserId(userId);
+
+    }
+
     private void updateGameResultFields(GameResult gameResult, GameResultDto gameResultDto) {
         gameResult.setUserId(gameResultDto.getUserId());
         gameResult.setResult(gameResultDto.getResult());
