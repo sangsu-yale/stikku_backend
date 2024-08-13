@@ -50,6 +50,11 @@ public class UserController {
         return new ResponseEntity<>(gameService.getAllGameByUserId(userId), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{user_id}/game")
+    public ResponseEntity<MessageResponse> deleteAllGameByUser(@PathVariable("user_id") Long userId) {
+        return new ResponseEntity<>(new MessageResponse(gameService.deleteAllGameByUser(userId)), HttpStatus.OK);
+    }
+
     @PutMapping("/{user_id}")
     public ResponseEntity<User> updateUser(@Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody UserDTO userDTO) {
         if(!tokenUserId.equals(userId.toString())){
