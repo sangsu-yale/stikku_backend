@@ -24,7 +24,6 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        System.out.println("AuthArgumentResolver.resolveArgument");
 
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
 

@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -112,7 +114,7 @@ public class GameService {
                 .orElseThrow(() -> new GameResultNotFoundException(gameId.toString()));
 
         Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameId);
-        GameReview gameReview = new GameReview();
+        GameReview gameReview;
         if (gameReviewOptional.isPresent()) {
             gameReview = gameReviewOptional.get();
         } else {
@@ -124,7 +126,6 @@ public class GameService {
         updateGameReviewFields(gameReview, gameReviewDto);
 
         GameResult saved = gameResultRepository.save(gameResult);
-        System.out.println("saved = " + saved);
         gameReviewRepository.save(gameReview);
 
         return new GameResponseDto(gameResult, gameReview);
@@ -166,40 +167,47 @@ public class GameService {
     }
 
     @Transactional
-    public List<GameResponseDto> syncGame(Long userId, List<GameRequestDto> gameRequestDtos) {
-        List<GameResult> gameResults = new ArrayList<>();
-        List<GameReview> gameReviews = new ArrayList<>();
+    public List<GameResponseDto> syncGame(Long userId, GameSyncRequestDto tickets) {
+        List<GameResponseDto> existedTickets = tickets.getExistedTickets();
+        List<GameRequestDto> newTickets = tickets.getNewTickets();
+
+        // 1. 클라이언트에는 있고, 서버에는 없는 값 삭제
+        List<GameResponseDto> dbTickets = getAllGameByUserId(userId);
+
+        Set<Long> existedTicketIds = existedTickets.stream()
+                .map(dto -> dto.getGameResult().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> dbTicketIds = dbTickets.stream()
+                .map(dto -> dto.getGameResult().getId())
+                .collect(Collectors.toSet());
+
+        dbTickets.stream()
+                .filter(dto -> !existedTicketIds.contains(dto.getGameResult().getId()))
+                .collect(Collectors.toList())
+                .stream()
+                .forEach(result -> deleteGame(result.getGameResult().getId()));
 
 
-        for(GameRequestDto gameRequestDto : gameRequestDtos) {
+        for (GameResponseDto existedTicket : existedTickets) {
+            // 2. 해당되는 티켓이 서버에 있는지 확인
+            // 2-1. 없으면 -> 새 티켓 생성
+            // 2-2. 있으면 -> 업데이트
 
-            GameResultDto gameResultDto = gameRequestDto.getGameResult();
+            Long id = existedTicket.getGameResult().getId();
+            GameRequestDto gameRequestDto = new GameRequestDto(convertGameResultToDto(existedTicket.getGameResult()), convertGameReviewToDto(existedTicket.getGameReview()));
 
-            // 1. 유효성 검사 - 필수값이 다 들어가 있는지 확인
-            validateGameRequestDto(gameRequestDto);
-
-            // 2. 유효성 검사 - 유효한 userId인지 확인
-            userRepository.findById(gameResultDto.getUserId())
-                    .orElseThrow(() -> new UserNotFoundException(gameResultDto.getUserId().toString()));
-
-            // 3. game result 저장
-            GameResult gameResult = new GameResult();
-            updateGameResultFields(gameResult, gameResultDto);
-            gameResults.add(gameResult);
-
+            if (dbTicketIds.contains(id)) {
+                updateGame(id, gameRequestDto);
+            } else {
+                createGame(gameRequestDto);
+            }
         }
 
-        List<GameResult> savedGameResults = gameResultRepository.saveAll(gameResults);
-
-        for (int i = 0; i < savedGameResults.size(); i++) {
-            // 4. game review 저장
-            GameReview gameReview = new GameReview();
-            gameReview.setGameResultId(savedGameResults.get(i).getId());
-            updateGameReviewFields(gameReview, gameRequestDtos.get(i).getGameReview());
-            gameReviews.add(gameReview);
+        // 3. 새 게임 저장
+        for(GameRequestDto newTicket : newTickets) {
+            createGame(newTicket);
         }
-
-        List<GameReview> savedGameReviews = gameReviewRepository.saveAll(gameReviews);
 
         return getAllGameByUserId(userId);
 
@@ -249,5 +257,41 @@ public class GameService {
             throw new MissingFieldException("Missing required fields: " + requiredNullFields.toString());
         }
 
+    }
+
+    private static GameResultDto convertGameResultToDto(GameResult gameResult) {
+        GameResultDto dto = new GameResultDto();
+
+        dto.setUserId(gameResult.getUserId());
+        dto.setResult(gameResult.getResult());
+        dto.setLiveView(gameResult.getIsLiveView());
+        dto.setTitle(gameResult.getTitle());
+        dto.setDate(gameResult.getDate());
+        dto.setStadium(gameResult.getStadium());
+        dto.setSeatLocation(gameResult.getSeatLocation());
+        dto.setTeam1(gameResult.getTeam1());
+        dto.setTeam2(gameResult.getTeam2());
+        dto.setScore1(gameResult.getScore1());
+        dto.setScore2(gameResult.getScore2());
+        dto.setTeam1IsMyTeam(gameResult.getIsTeam1IsMyteam());
+        dto.setTeam2IsMyTeam(gameResult.getIsTeam2IsMyteam());
+        dto.setComment(gameResult.getComment());
+        dto.setPictureUrl(gameResult.getPictureUrl());
+
+        return dto;
+    }
+
+    private static GameReviewDto convertGameReviewToDto(GameReview gameReview) {
+        GameReviewDto dto = new GameReviewDto();
+
+        dto.setReview(gameReview.getReview());
+        dto.setRating(gameReview.getRating());
+        dto.setPlayerOfTheMatch(gameReview.getPlayerOfTheMatch());
+        dto.setMood(gameReview.getMood());
+        dto.setHomeTeamLineup(gameReview.getHomeTeamLineup());
+        dto.setAwayTeamLineup(gameReview.getAwayTeamLineup());
+        dto.setFood(gameReview.getFood());
+
+        return dto;
     }
 }

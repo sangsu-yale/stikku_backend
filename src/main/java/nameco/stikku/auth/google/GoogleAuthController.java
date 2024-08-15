@@ -1,23 +1,14 @@
 package nameco.stikku.auth.google;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import nameco.stikku.auth.google.dto.GoogleAuthRequestDto;
 import nameco.stikku.auth.google.dto.GoogleUserInfoDto;
 import nameco.stikku.user.User;
 import nameco.stikku.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/login/oauth/google")
