@@ -3,8 +3,8 @@ package nameco.stikku.user;
 import jakarta.servlet.http.HttpServletRequest;
 import nameco.stikku.advice.exception.AccesDeniedException;
 import nameco.stikku.game.GameService;
-import nameco.stikku.game.dto.GameRequestDto;
 import nameco.stikku.game.dto.GameResponseDto;
+import nameco.stikku.game.dto.GameSyncRequestDto;
 import nameco.stikku.resolver.Auth;
 import nameco.stikku.responseDto.MessageResponse;
 import nameco.stikku.user.dto.UserDTO;
@@ -73,11 +73,11 @@ public class UserController {
     }
 
     @PostMapping("/{user_id}/game/sync")
-    public ResponseEntity<?> syncGame(@Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody List<GameRequestDto> games) {
+    public ResponseEntity<?> syncGame(@Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody GameSyncRequestDto tickets) {
         if (!tokenUserId.equals(userId.toString())) {
             throw new AccesDeniedException("권한이 없습니다.");
         }
-        List<GameResponseDto> gameResponseDtos = gameService.syncGame(userId, games);
+        List<GameResponseDto> gameResponseDtos = gameService.syncGame(userId, tickets);
         return new ResponseEntity<>(gameResponseDtos, HttpStatus.CREATED);
     }
 }
