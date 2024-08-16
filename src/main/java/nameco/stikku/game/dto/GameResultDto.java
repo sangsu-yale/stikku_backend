@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 public class GameResultDto {
     private Long userId;
+    private String uuid;
     private GameResult.GameResultStatus result;
     private boolean isLiveView;
     private String title;
@@ -30,6 +31,14 @@ public class GameResultDto {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public GameResult.GameResultStatus getResult() {

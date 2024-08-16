@@ -38,6 +38,9 @@ public class GameResult {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String uuid;
+
     @Column(name="user_id", nullable = false)
     private Long userId;
 
@@ -112,6 +115,10 @@ public class GameResult {
         return id;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
     public Long getUserId() {
         return userId;
     }
@@ -182,6 +189,10 @@ public class GameResult {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public void setUserId(Long userId) {
