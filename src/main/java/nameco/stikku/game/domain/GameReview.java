@@ -19,6 +19,9 @@ public class GameReview {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String uuid;
+
     @Column(name = "game_results_id", nullable = false)
     private Long gameResultId;
 

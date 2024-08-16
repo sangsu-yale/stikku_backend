@@ -8,6 +8,7 @@ import nameco.stikku.game.domain.GameReview;
 import java.util.List;
 
 public class GameReviewDto {
+    private String uuid;
     private String review;
     private Integer rating;
     private String playerOfTheMatch;
@@ -15,6 +16,14 @@ public class GameReviewDto {
     private List<String> homeTeamLineup;
     private List<String> awayTeamLineup;
     private String food;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getReview() {
         return review;

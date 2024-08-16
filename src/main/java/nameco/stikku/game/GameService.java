@@ -61,11 +61,11 @@ public class GameService {
         return new GameResponseDto(savedGameResult, savedGameReview);
     }
 
-    public GameResponseDto getGameById(Long gameId) {
-        GameResult gameResult = gameResultRepository.findById(gameId)
-                .orElseThrow(() -> new GameResultNotFoundException(gameId.toString()));
+    public GameResponseDto getGameByUuid(String uuid) {
+        GameResult gameResult = gameResultRepository.findByUuid(uuid)
+                .orElseThrow(() -> new GameResultNotFoundException(uuid));
 
-        Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameId);
+        Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameResult.getId());
         GameReview gameReview = new GameReview();
         if (gameReviewOptional.isPresent()) {
             gameReview = gameReviewOptional.get();
@@ -99,7 +99,7 @@ public class GameService {
     }
 
     @Transactional
-    public GameResponseDto updateGame(Long gameId, GameRequestDto gameRequestDto) {
+    public GameResponseDto updateGame(String uuid, GameRequestDto gameRequestDto) {
         GameResultDto gameResultDto = gameRequestDto.getGameResult();
         GameReviewDto gameReviewDto = gameRequestDto.getGameReview();
 
@@ -110,10 +110,10 @@ public class GameService {
                 .orElseThrow(() -> new UserNotFoundException(gameResultDto.getUserId().toString()));
 
         // 2. 유효성 검사 - 유효한 gameId인지 확인
-        GameResult gameResult = gameResultRepository.findById(gameId)
-                .orElseThrow(() -> new GameResultNotFoundException(gameId.toString()));
+        GameResult gameResult = gameResultRepository.findByUuid(uuid)
+                .orElseThrow(() -> new GameResultNotFoundException(uuid));
 
-        Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameId);
+        Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameResult.getId());
         GameReview gameReview;
         if (gameReviewOptional.isPresent()) {
             gameReview = gameReviewOptional.get();
@@ -125,32 +125,33 @@ public class GameService {
         updateGameResultFields(gameResult, gameResultDto);
         updateGameReviewFields(gameReview, gameReviewDto);
 
-        GameResult saved = gameResultRepository.save(gameResult);
-        gameReviewRepository.save(gameReview);
+        GameResult savedGameResult = gameResultRepository.save(gameResult);
+        GameReview savedGameReview = gameReviewRepository.save(gameReview);
 
-        return new GameResponseDto(gameResult, gameReview);
+        return new GameResponseDto(savedGameResult, savedGameReview);
     }
 
     @Transactional
-    public boolean updateFavorite(Long gameId, FavoriteUpdateDto favoriteUpdateDto) {
-        GameResult gameResult = gameResultRepository.findById(gameId).orElseThrow(() -> new GameResultNotFoundException(gameId.toString()));
+    public boolean updateFavorite(String uuid, FavoriteUpdateDto favoriteUpdateDto) {
+        GameResult gameResult = gameResultRepository.findByUuid(uuid)
+                .orElseThrow(() -> new GameResultNotFoundException(uuid));
         gameResult.setIsFavorite(favoriteUpdateDto.getIsFavorite());
         GameResult saved = gameResultRepository.save(gameResult);
         return saved.getIsFavorite();
     }
 
     @Transactional
-    public String deleteGame(Long gameId) {
-        GameResult gameResult = gameResultRepository.findById(gameId)
-                .orElseThrow(() -> new GameResultNotFoundException(gameId.toString()));
-        Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameId);
+    public String deleteGame(String uuid) {
+        GameResult gameResult = gameResultRepository.findByUuid(uuid)
+                .orElseThrow(() -> new GameResultNotFoundException(uuid));
+        Optional<GameReview> gameReviewOptional = gameReviewRepository.findByGameResultId(gameResult.getId());
 
         gameResultRepository.deleteById(gameResult.getId());
         if (gameReviewOptional.isPresent()) {
             gameReviewRepository.deleteById(gameReviewOptional.get().getId());
         }
 
-        return gameId.toString();
+        return uuid;
     }
 
     @Transactional
@@ -178,15 +179,15 @@ public class GameService {
                 .map(dto -> dto.getGameResult().getId())
                 .collect(Collectors.toSet());
 
-        Set<Long> dbTicketIds = dbTickets.stream()
-                .map(dto -> dto.getGameResult().getId())
+        Set<String> dbTicketIds = dbTickets.stream()
+                .map(dto -> dto.getGameResult().getUuid())
                 .collect(Collectors.toSet());
 
         dbTickets.stream()
                 .filter(dto -> !existedTicketIds.contains(dto.getGameResult().getId()))
                 .collect(Collectors.toList())
                 .stream()
-                .forEach(result -> deleteGame(result.getGameResult().getId()));
+                .forEach(result -> deleteGame(result.getGameResult().getUuid()));
 
 
         for (GameResponseDto existedTicket : existedTickets) {
@@ -194,11 +195,11 @@ public class GameService {
             // 2-1. 없으면 -> 새 티켓 생성
             // 2-2. 있으면 -> 업데이트
 
-            Long id = existedTicket.getGameResult().getId();
+            String uuid = existedTicket.getGameResult().getUuid();
             GameRequestDto gameRequestDto = new GameRequestDto(convertGameResultToDto(existedTicket.getGameResult()), convertGameReviewToDto(existedTicket.getGameReview()));
 
-            if (dbTicketIds.contains(id)) {
-                updateGame(id, gameRequestDto);
+            if (dbTicketIds.contains(uuid)) {
+                updateGame(uuid, gameRequestDto);
             } else {
                 createGame(gameRequestDto);
             }
@@ -214,6 +215,7 @@ public class GameService {
     }
 
     private void updateGameResultFields(GameResult gameResult, GameResultDto gameResultDto) {
+        gameResult.setUuid(gameResultDto.getUuid());
         gameResult.setUserId(gameResultDto.getUserId());
         gameResult.setResult(gameResultDto.getResult());
         gameResult.setIsLiveView(gameResultDto.isLiveView());
@@ -233,6 +235,7 @@ public class GameService {
     }
 
     private void updateGameReviewFields(GameReview gameReview, GameReviewDto gameReviewDto) {
+        gameReview.setUuid(gameReviewDto.getUuid());
         gameReview.setReview(gameReviewDto.getReview());
         gameReview.setRating(gameReviewDto.getRating());
         gameReview.setPlayerOfTheMatch(gameReviewDto.getPlayerOfTheMatch());
@@ -245,6 +248,7 @@ public class GameService {
     private void validateGameRequestDto(GameRequestDto gameRequestDto) {
         List<String> requiredNullFields = new ArrayList<>();
 
+        if (gameRequestDto.getGameResult().getUuid() == null) requiredNullFields.add("uuid");
         if (gameRequestDto.getGameResult().getUserId() == null) requiredNullFields.add("userId");
         if (gameRequestDto.getGameResult().getResult() == null) requiredNullFields.add("result");
         if (gameRequestDto.getGameResult().getDate() == null) requiredNullFields.add("date");
@@ -262,6 +266,7 @@ public class GameService {
     private static GameResultDto convertGameResultToDto(GameResult gameResult) {
         GameResultDto dto = new GameResultDto();
 
+        dto.setUuid(gameResult.getUuid());
         dto.setUserId(gameResult.getUserId());
         dto.setResult(gameResult.getResult());
         dto.setLiveView(gameResult.getIsLiveView());
@@ -284,6 +289,7 @@ public class GameService {
     private static GameReviewDto convertGameReviewToDto(GameReview gameReview) {
         GameReviewDto dto = new GameReviewDto();
 
+        dto.setUuid(gameReview.getUuid());
         dto.setReview(gameReview.getReview());
         dto.setRating(gameReview.getRating());
         dto.setPlayerOfTheMatch(gameReview.getPlayerOfTheMatch());

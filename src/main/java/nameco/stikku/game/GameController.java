@@ -32,34 +32,34 @@ public class GameController {
         return new ResponseEntity<>(gameService.createGame(gameRequestDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GameResponseDto> getGameById(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(gameService.getGameById(id), HttpStatus.OK);
+    @GetMapping("/{uuid}")
+    public ResponseEntity<GameResponseDto> getGameById(@PathVariable("uuid") String uuid) {
+        return new ResponseEntity<>(gameService.getGameByUuid(uuid), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<GameResponseDto> updateGame(@Auth String tokenUserId, @PathVariable("id") Long id, @RequestBody GameRequestDto gameRequestDto) {
+    @PutMapping("/{uuid}")
+    public ResponseEntity<GameResponseDto> updateGame(@Auth String tokenUserId, @PathVariable("uuid") String uuid, @RequestBody GameRequestDto gameRequestDto) {
         if(!tokenUserId.equals(gameRequestDto.getGameResult().getUserId().toString())){
             throw new AccesDeniedException("권한이 없습니다.");
         }
-        return new ResponseEntity<>(gameService.updateGame(id, gameRequestDto), HttpStatus.OK);
+        return new ResponseEntity<>(gameService.updateGame(uuid, gameRequestDto), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/favorite")
-    public ResponseEntity<Void> updateGameFavorite(@Auth String tokenUserId, @PathVariable("id") Long id, @RequestBody FavoriteUpdateDto favoriteUpdateDto) {
-        if (!tokenUserId.equals(gameService.getGameById(id).getGameResult().getUserId().toString())) {
+    @PutMapping("/{uuid}/favorite")
+    public ResponseEntity<Void> updateGameFavorite(@Auth String tokenUserId, @PathVariable("uuid") String uuid, @RequestBody FavoriteUpdateDto favoriteUpdateDto) {
+        if (!tokenUserId.equals(gameService.getGameByUuid(uuid).getGameResult().getUserId().toString())) {
             throw new AccesDeniedException("권한이 없습니다.");
         }
-        gameService.updateFavorite(id, favoriteUpdateDto);
+        gameService.updateFavorite(uuid, favoriteUpdateDto);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponse> deleteGame(@Auth String tokenUserId, @PathVariable("id") Long id){
-        if (!tokenUserId.equals(gameService.getGameById(id).getGameResult().getUserId().toString())) {
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<MessageResponse> deleteGame(@Auth String tokenUserId, @PathVariable("uuid") String uuid){
+        if (!tokenUserId.equals(gameService.getGameByUuid(uuid).getGameResult().getUserId().toString())) {
             throw new AccesDeniedException("권한이 없습니다.");
         }
-        String deletedGameId = gameService.deleteGame(id);
+        String deletedGameId = gameService.deleteGame(uuid);
         return new ResponseEntity<>(new MessageResponse("Game " + deletedGameId + " deleted successfully"), HttpStatus.OK);
     }
 }
