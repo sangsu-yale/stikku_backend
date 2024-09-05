@@ -1,5 +1,11 @@
 package nameco.stikku.auth.google;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import nameco.stikku.auth.google.dto.GoogleAuthRequestDto;
 import nameco.stikku.auth.google.dto.GoogleUserInfoDto;
 import nameco.stikku.user.User;
@@ -12,6 +18,7 @@ import java.util.HashMap;
 
 @RestController
 @RequestMapping("/login/oauth/google")
+@Tag(name = "Google OAuth Login", description = "구글 소셜 로그인 후 API 서버 액세스 토큰 발급")
 public class GoogleAuthController {
 
     private final UserService userService;
@@ -26,7 +33,13 @@ public class GoogleAuthController {
     }
 
     @PostMapping
-    public ResponseEntity<?> authenticateUser(@RequestBody GoogleAuthRequestDto googleAuthRequestDto) {
+    @Operation(summary = "구글 소셜 로그인 후 API 서버용 액세스 토큰 발급", description = "구글 소셜 로그인 후 발급된 구글 액세스 토큰을 통해 API 서버 액세스 토큰을 발급받습니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "API 서버 액세스 토큰 발급 성공", content = @Content(mediaType = "application/json"))
+    })
+    @Parameter(name = "accessToken", description = "구글 소셜 로그인 후 받은 구글 액세스 토큰")
+    public ResponseEntity<GoogleOAuthLoginSuccessResponse> authenticateUser(@RequestBody GoogleAuthRequestDto googleAuthRequestDto) {
+
         String googleAccessToken = googleAuthRequestDto.getAccessToken();
 
         GoogleUserInfoDto googleUserInfo = googleAuthService.getUserInfoFromAccessToken(googleAccessToken);
@@ -35,10 +48,25 @@ public class GoogleAuthController {
 
         String accessToken = jwtService.generateToken(user);
 
-        HashMap<String, String> responseBody = new HashMap<>();
-        responseBody.put("accessToken", accessToken);
+        GoogleOAuthLoginSuccessResponse responseBody = new GoogleOAuthLoginSuccessResponse(accessToken);
 
         return ResponseEntity.ok(responseBody);
+    }
+
+    private class GoogleOAuthLoginSuccessResponse {
+        private String accessToken;
+
+        public GoogleOAuthLoginSuccessResponse(String accessToken) {
+            this.accessToken = accessToken;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
     }
 
 

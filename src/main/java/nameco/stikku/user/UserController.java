@@ -1,11 +1,12 @@
 package nameco.stikku.user;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import nameco.stikku.advice.exception.AccesDeniedException;
 import nameco.stikku.game.GameService;
 import nameco.stikku.game.dto.GameResponseDto;
 import nameco.stikku.game.dto.GameSyncRequestDto;
-import nameco.stikku.resolver.Auth;
+import nameco.stikku.annotation.Auth;
 import nameco.stikku.responseDto.MessageResponse;
 import nameco.stikku.user.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "User API", description = "사용자 계정 정보")
 public class UserController {
 
     private final UserService userService;

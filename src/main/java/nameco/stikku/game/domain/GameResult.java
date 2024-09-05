@@ -1,5 +1,6 @@
 package nameco.stikku.game.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name="game_results")
+@Schema(description = "게임 티켓 중 필수 정보를 담은 객체")
 public class GameResult {
     public GameResult() {
 
@@ -36,15 +38,19 @@ public class GameResult {
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "DB에 저장되는 고유 아이디", example = "1004")
     private Long id;
 
     @Column(nullable = false)
+    @Schema(description = "클라이언트에서 게임 티켓을 생성할 때 함께 생성하는 고유 식별 번호", example = "0000-0000-...")
     private String uuid;
 
     @Column(name="user_id", nullable = false)
+    @Schema(description = "사용자 아이디", example = "2004")
     private Long userId;
 
     @Column(nullable = false)
+    @Schema(description = "게임 결과", example = "WIN, LOSE, TIE, RAIN")
     private GameResultStatus result;
 
     @Column(name = "is_live_view", nullable = false)

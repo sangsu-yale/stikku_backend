@@ -1,7 +1,8 @@
 package nameco.stikku.setting;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import nameco.stikku.advice.exception.AccesDeniedException;
-import nameco.stikku.resolver.Auth;
+import nameco.stikku.annotation.Auth;
 import nameco.stikku.setting.dto.SettingUpdateDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/settings")
+@Tag(name = "User Setting API", description = "사용자 계정 설정 정보")
 public class SettingController {
 
     private final SettingService settingService;

@@ -2,6 +2,7 @@ package nameco.stikku.image;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/images")
+@Tag(name = "Image API", description = "이미지 처리와 관련된 API")
 public class ImageController {
 
     private final AmazonS3Client amazonS3Client;

@@ -2,6 +2,7 @@ package nameco.stikku.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import nameco.stikku.advice.exception.AccesDeniedException;
+import nameco.stikku.annotation.Auth;
 import nameco.stikku.auth.google.JwtService;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
