@@ -3,6 +3,8 @@ package nameco.stikku.image;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import nameco.stikku.annotation.image.UploadProfileImageOperation;
+import nameco.stikku.annotation.image.UploadTicketImageOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,7 @@ public class ImageController {
     private String bucket;
 
     @PostMapping("/ticket")
+    @UploadTicketImageOperation
     public ResponseEntity<?> uploadTicketImage(@RequestParam("image") MultipartFile image) {
 
         try {
@@ -56,6 +59,7 @@ public class ImageController {
     }
 
     @PostMapping("/profile")
+    @UploadProfileImageOperation
     public ResponseEntity<?> uploadProfileImage(@RequestParam("image") MultipartFile image) {
 
         try {
