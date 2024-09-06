@@ -23,6 +23,5 @@ import java.lang.annotation.Target;
 ))
 @AuthHeaderParameter
 @UuidParameter
-@Parameter(name = "GameRequestDto", description = "요청 바디 - GameRequestDto Scheme 참고")
 public @interface UpdateGameOperation {
 }

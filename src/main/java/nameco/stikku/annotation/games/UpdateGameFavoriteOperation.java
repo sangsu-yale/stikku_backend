@@ -16,6 +16,5 @@ import java.lang.annotation.Target;
 @Operation(summary = "티켓 즐겨찾기 업데이트", description = "uuid를 통해 Game Result를 조회하고, 해당 Game Result의 즐겨찾기를 업데이트합니다.")
 @ApiResponse(responseCode = "204", description = "정상적으로 수정이 완료된 경우")
 @AuthHeaderParameter @UuidParameter
-@Parameter(name = "favoriteUpdateDto", description = "즐겨찾기를 추가하는 경우 true, 취소하는 경우 false", required = true)
 public @interface UpdateGameFavoriteOperation {
 }
