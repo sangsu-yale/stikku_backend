@@ -1,8 +1,11 @@
 package nameco.stikku.setting;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import nameco.stikku.advice.exception.AccesDeniedException;
 import nameco.stikku.annotation.Auth;
+import nameco.stikku.annotation.setting.GetSettingOperation;
+import nameco.stikku.annotation.setting.UpdateSettingOperation;
 import nameco.stikku.setting.dto.SettingUpdateDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,12 +26,14 @@ public class SettingController {
     }
 
     @GetMapping("/{user_id}")
+    @GetSettingOperation
     public ResponseEntity<Setting> getSettingByUserId(@PathVariable("user_id") Long userId) {
         return new ResponseEntity<>(settingService.getSettingByUserId(userId), HttpStatus.OK);
     }
 
     @PutMapping("/{user_id}")
-    public ResponseEntity<Setting> updateSetting(@Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody SettingUpdateDto settingUpdateDto){
+    @UpdateSettingOperation
+    public ResponseEntity<Setting> updateSetting(@Parameter(hidden = true) @Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody SettingUpdateDto settingUpdateDto){
         if (!tokenUserId.equals(userId.toString())) {
             throw new AccesDeniedException("권한이 없습니다.");
         }

@@ -51,7 +51,7 @@ public class SwaggerConfig {
     public OpenApiCustomizer gameApiResponsesCustomizer() {
         return openApi -> openApi.getPaths().entrySet().stream()
                 // /games 경로에만 적용
-                .filter(path -> path.getKey().startsWith("/games"))
+                .filter(path -> path.getKey().startsWith("/games") || path.getKey().startsWith("/settings"))
                 .forEach(path -> path.getValue().readOperations().forEach(operation -> {
                     // 400 Bad Request 예외 응답 추가
                     ApiResponse badRequestResponse = new ApiResponse()
@@ -78,7 +78,7 @@ public class SwaggerConfig {
 
                     // 406 Not Acceptable 예외 응답 추가
                     ApiResponse accessDeniedResponse = new ApiResponse()
-                            .description("Access Denied - 액세스 토큰이 유효하지 않은 경우")
+                            .description("Access Denied - (Authorization 헤더 사용 시) 액세스 토큰이 유효하지 않은 경우")
                             .content(new Content().addMediaType("application/json",
                                     new MediaType().schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
                                             .example(new Example().value(new ErrorResponse(406, "Access Denied - 유효하지 않은 접근입니다.")))
