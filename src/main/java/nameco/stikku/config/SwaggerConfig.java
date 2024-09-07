@@ -51,7 +51,7 @@ public class SwaggerConfig {
     public OpenApiCustomizer gameApiResponsesCustomizer() {
         return openApi -> openApi.getPaths().entrySet().stream()
                 // /games 경로에만 적용
-                .filter(path -> path.getKey().startsWith("/games") || path.getKey().startsWith("/settings"))
+                .filter(path -> path.getKey().startsWith("/games") || path.getKey().startsWith("/settings") || path.getKey().startsWith("/users"))
                 .forEach(path -> path.getValue().readOperations().forEach(operation -> {
                     // 400 Bad Request 예외 응답 추가
                     ApiResponse badRequestResponse = new ApiResponse()
@@ -62,15 +62,8 @@ public class SwaggerConfig {
                             ));
 
                     // 404 Not Found 예외 응답 추가
-                    ApiResponse userNotFoundResponse = new ApiResponse()
-                            .description("Not Found - 해당하는 사용자 정보를 찾을 수 없는 경우")
-                            .content(new Content().addMediaType("application/json",
-                                    new MediaType().schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
-                                            .example(new Example().value(new ErrorResponse(404, "Not Found - User Not Found")))
-                            ));
-
                     ApiResponse gameNotFoundResponse = new ApiResponse()
-                            .description("Not Found - 해당하는 게임 티켓을 찾을 수 없는 경우")
+                            .description("Not Found - 해당하는 게임 티켓/사용자 정보를 찾을 수 없는 경우")
                             .content(new Content().addMediaType("application/json",
                                     new MediaType().schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
                                             .example(new Example().value(new ErrorResponse(404, "Not Found - Game Not Found")))
@@ -94,7 +87,6 @@ public class SwaggerConfig {
 
                     // 공통 예외 응답을 전역에 추가
                     operation.getResponses().addApiResponse("400", badRequestResponse);
-                    operation.getResponses().addApiResponse("404", userNotFoundResponse);
                     operation.getResponses().addApiResponse("404", gameNotFoundResponse);
                     operation.getResponses().addApiResponse("406", accessDeniedResponse);
                     operation.getResponses().addApiResponse("500", internalServerErrorResponse);

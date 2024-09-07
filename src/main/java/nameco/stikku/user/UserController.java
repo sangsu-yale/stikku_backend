@@ -1,8 +1,10 @@
 package nameco.stikku.user;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import nameco.stikku.advice.exception.AccesDeniedException;
+import nameco.stikku.annotation.users.*;
 import nameco.stikku.game.GameService;
 import nameco.stikku.game.dto.GameResponseDto;
 import nameco.stikku.game.dto.GameSyncRequestDto;
@@ -31,11 +33,13 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}")
+    @GetUserByIdOperation
     public ResponseEntity<User> getUserById(@PathVariable("user_id") Long userId) {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
     @GetMapping
+    @GetUserByAccessTokenOperation
     public ResponseEntity<User> getUserByAccessToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
         if(authorization != null && authorization.startsWith("Bearer")){
@@ -48,17 +52,21 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}/game")
+    @GetAllGameByUserOperation
     public ResponseEntity<List<GameResponseDto>> getAllGameByUser(@PathVariable("user_id") Long userId) {
         return new ResponseEntity<>(gameService.getAllGameByUserId(userId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{user_id}/game")
+    @DeleteAllGameByUserOperation
+    /* TODO : 토큰 확인 필요 */
     public ResponseEntity<MessageResponse> deleteAllGameByUser(@PathVariable("user_id") Long userId) {
         return new ResponseEntity<>(new MessageResponse(gameService.deleteAllGameByUser(userId)), HttpStatus.OK);
     }
 
     @PutMapping("/{user_id}")
-    public ResponseEntity<User> updateUser(@Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody UserDTO userDTO) {
+    @UpdateUserOperation
+    public ResponseEntity<User> updateUser(@Parameter(hidden = true) @Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody UserDTO userDTO) {
         if(!tokenUserId.equals(userId.toString())){
             throw new AccesDeniedException("권한이 없습니다.");
         }
@@ -66,7 +74,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{user_id}")
-    public ResponseEntity<MessageResponse> deleteUser(@Auth String tokenUserId, @PathVariable("user_id") Long userId) {
+    @DeleteUserOperation
+    public ResponseEntity<MessageResponse> deleteUser(@Parameter(hidden = true) @Auth String tokenUserId, @PathVariable("user_id") Long userId) {
         if(!tokenUserId.equals(userId.toString())){
             throw new AccesDeniedException("권한이 없습니다.");
         }
@@ -75,7 +84,9 @@ public class UserController {
     }
 
     @PostMapping("/{user_id}/game/sync")
-    public ResponseEntity<?> syncGame(@Auth String tokenUserId, @PathVariable("user_id") Long userId, @RequestBody GameSyncRequestDto tickets) {
+    @SyncGameOperation
+    public ResponseEntity<?> syncGame(@Parameter(hidden = true) @Auth String tokenUserId, @PathVariable("user_id") Long userId,
+                                    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "newTickets: 로컬에만 저장되어 있고, 아직 서버에 동기화되지 않은 티켓(id가 존재하지 않음) <br> existedTickets: 서버에 동기화된 티켓(GameResult와 GameReview가 id를 가짐) ") @RequestBody GameSyncRequestDto tickets) {
         if (!tokenUserId.equals(userId.toString())) {
             throw new AccesDeniedException("권한이 없습니다.");
         }

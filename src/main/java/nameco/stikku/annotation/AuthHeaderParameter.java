@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "API 서버에서 발급받은 액세스 토큰", required = true)
+@Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "API 서버에서 발급받은 액세스 토큰 (형식: Bearer {토큰})", required = true)
 public @interface AuthHeaderParameter {
 }
