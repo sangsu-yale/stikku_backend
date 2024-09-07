@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
 
 import java.util.Arrays;
+import java.util.Map;
 
 @Configuration
 public class SwaggerConfig {
@@ -58,7 +59,7 @@ public class SwaggerConfig {
                             .description("Bad Request - 요청 바디 값이 올바르지 않은 경우")
                             .content(new Content().addMediaType("application/json",
                                     new MediaType().schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
-                                            .example(new Example().value(new ErrorResponse(400, "Bad Request - Invalid User Email")))
+                                            .examples(Map.of("BadRequestExample", new Example().value(new ErrorResponse(400, "Bad Request - Invalid User Email"))))
                             ));
 
                     // 404 Not Found 예외 응답 추가
@@ -66,7 +67,7 @@ public class SwaggerConfig {
                             .description("Not Found - 해당하는 게임 티켓/사용자 정보를 찾을 수 없는 경우")
                             .content(new Content().addMediaType("application/json",
                                     new MediaType().schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
-                                            .example(new Example().value(new ErrorResponse(404, "Not Found - Game Not Found")))
+                                            .examples(Map.of("GameNotFoundExample", new Example().value(new ErrorResponse(404, "Not Found - Game 1004 Not Found")),"UserNotFoundExample", new Example().value(new ErrorResponse(404, "Not Found - User 1004 Not Found"))))
                             ));
 
                     // 406 Not Acceptable 예외 응답 추가
@@ -74,7 +75,7 @@ public class SwaggerConfig {
                             .description("Access Denied - (Authorization 헤더 사용 시) 액세스 토큰이 유효하지 않은 경우")
                             .content(new Content().addMediaType("application/json",
                                     new MediaType().schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
-                                            .example(new Example().value(new ErrorResponse(406, "Access Denied - 유효하지 않은 접근입니다.")))
+                                            .examples(Map.of("AccessDeniedExample", new Example().value(new ErrorResponse(406, "Access Denied - 유효하지 않은 접근입니다."))))
                             ));
 
                     // 500 Internal Server Error 예외 응답 추가
@@ -82,7 +83,7 @@ public class SwaggerConfig {
                             .description("Internal Server Error - 서버 오류")
                             .content(new Content().addMediaType("application/json",
                                     new MediaType().schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
-                                            .example(new Example().value(new ErrorResponse(500, "Internal Server Error - 서버 에러")))
+                                            .examples(Map.of("InternalServerErrorExample", new Example().value(new ErrorResponse(500, "Internal Server Error - 서버 에러"))))
                             ));
 
                     // 공통 예외 응답을 전역에 추가
