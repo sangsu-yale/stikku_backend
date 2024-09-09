@@ -1,20 +1,27 @@
 package nameco.stikku.game.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nameco.stikku.game.domain.GameReview;
 
 import java.util.List;
 
+@Schema(description = "게임 티켓 중 옵션 정보를 담은 객체")
 public class GameReviewDto {
+    @Schema(description = "클라이언트에서 게임 티켓을 생성할 때 함께 생성하는 고유 식별 번호", example = "0000-0000-...")
     private String uuid;
+    @Schema(description = "경기 리뷰")
     private String review;
+    @Schema(description = "별점")
     private Integer rating;
+    @Schema(description = "경기 수훈선수")
     private String playerOfTheMatch;
+    @Schema(description = "감정", example = "HAPPY, SURPRISED, ANGRY, BORED, FUN")
     private GameReview.Mood mood;
+    @Schema(description = "홈팀 라인업")
     private List<String> homeTeamLineup;
+    @Schema(description = "원정팀 라인업")
     private List<String> awayTeamLineup;
+    @Schema(description = "음식")
     private String food;
 
     public String getUuid() {

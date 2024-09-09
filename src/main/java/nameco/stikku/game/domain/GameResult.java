@@ -16,7 +16,7 @@ public class GameResult {
 
     }
 
-    public GameResult(Long id, Long userId, GameResultStatus result, boolean isLiveView, String title, LocalDate date, String stadium, String seatLocation, String team1, String team2, Integer score1, Integer score2, boolean team1IsMyteam, boolean team2IsMyteam, String comment, String pictureUrl, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public GameResult(Long id, Long userId, GameResultStatus result, boolean isLiveView, String title, LocalDate date, String stadium, String seatLocation, String team1, String team2, Integer score1, Integer score2, boolean isTeam1IsMyteam, boolean team2IsMyteam, String comment, String pictureUrl, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.userId = userId;
         this.result = result;
@@ -38,7 +38,7 @@ public class GameResult {
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "DB에 저장되는 고유 아이디", example = "1004")
+    @Schema(description = "DB에 저장되는 Game Result의 고유 아이디", example = "1004")
     private Long id;
 
     @Column(nullable = false)
@@ -54,48 +54,64 @@ public class GameResult {
     private GameResultStatus result;
 
     @Column(name = "is_live_view", nullable = false)
+    @Schema(description = "직관/집관 여부 (직관이면 true)")
     private boolean isLiveView = false;
 
+    @Schema(description = "경기 제목")
     private String title;
 
     @Column(nullable = false)
+    @Schema(description = "경기 일자", example = "yyyy-mm-dd")
     private LocalDate date;
 
+    @Schema(description = "경기장")
     private String stadium;
 
     @Column(name = "seat_location")
+    @Schema(description = "좌석")
     private String seatLocation;
 
     @Column(nullable = false)
+    @Schema(description = "팀1 팀명")
     private String team1;
 
     @Column(nullable = false)
+    @Schema(description = "팀2 팀명")
     private String team2;
 
     @Column(nullable = false)
+    @Schema(description = "팀1 점수")
     private Integer score1;
 
     @Column(nullable = false)
+    @Schema(description = "팀2 점수")
     private Integer score2;
 
     @Column(name = "team1_is_myteam")
+    @Schema(description = "팀1 응원팀 여부 (응원팀이면 true)", defaultValue = "false")
     private boolean team1IsMyteam = false;
 
     @Column(name = "team2_is_myteam")
+    @Schema(description = "팀2 응원팀 여부 (응원팀이면 true)", defaultValue = "false")
     private boolean team2IsMyteam = false;
 
+    @Schema(description = "경기 한줄평")
     private String comment;
 
     @Column(name = "picture_url")
+    @Schema(description = "이미지 URL")
     private String pictureUrl;
 
     @Column(name = "is_favorite")
+    @Schema(description = "티켓 즐겨찾기 여부", defaultValue = "false")
     private Boolean isFavorite = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Schema(description = "티켓 생성 날짜(자동 생성)")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
+    @Schema(description = "티켓 마지막 수정 날짜(자동 생성 및 업데이트)")
     private LocalDateTime updatedAt;
 
     @PrePersist
